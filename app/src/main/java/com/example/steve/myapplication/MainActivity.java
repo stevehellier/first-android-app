@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -79,10 +80,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         } else {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
         }
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
 
         mLocationManager.addNmeaListener(this);
 
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
             }
         }
     }
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         mLat = location.getLatitude();
         mLong = location.getLongitude();
         mAlt = location.getAltitude();
+
         double speed = location.getSpeed();
         double fSpeedMph = (speed * mph);
         double fSpeedKph = (speed * kph);
@@ -149,23 +151,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         String where = "NaNaS";
 
         if (mBearing >= 350 || mBearing <= 10)
-            where = "N";
+            where = " N";
         if (mBearing < 350 && mBearing > 280)
             where = "NW";
         if (mBearing <= 280 && mBearing > 260)
-            where = "W";
+            where = " W";
         if (mBearing <= 260 && mBearing > 190)
             where = "SW";
         if (mBearing <= 190 && mBearing > 170)
-            where = "S";
+            where = " S";
         if (mBearing <= 170 && mBearing > 100)
             where = "SE";
         if (mBearing <= 100 && mBearing > 80)
-            where = "E";
+            where = " E";
         if (mBearing <= 80 && mBearing > 10)
             where = "NE";
 
-        txtHdg.setText(String.format(locale,"%.5s ° %s", mBearing, where));
+        DecimalFormat format = new DecimalFormat("#");
+        format.setDecimalSeparatorAlwaysShown(false);
+
+        txtHdg.setText(format.format(mBearing) + " ° " +  where);
+//        Log.d("Test",String.format(locale,"%s ° %s", format.format(mBearing), where));
 
         // Set Speed text and convert to MPH or KPH
         if (bSpeedImp) {
